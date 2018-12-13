@@ -1,0 +1,226 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Js Scope</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h1>Js Scope</h1>
+					<h2>And Closures</h2>
+					<p class="fragment">Understanding “scope” and “closures” is key to learning JavaScript</p>
+				</section>
+				<section>
+					<section>
+						<h4>Global Object</h4>
+						<p>In JavaScript, all global variables and functions are properties of a special object called a global object.</p>
+					</section>
+					<section>
+						<p>Assigning or reading a global variable, we actually work with the window properties.</p>
+						<pre><code data-trim contenteditable>
+							var a = 5; //declaration var creates  window.a property
+							alert( window.a ); //5		
+						</code></pre>
+						<p>You can create a variable by explicit assignment in window:</p>
+						<pre><code data-trim contenteditable>
+							window.a = 5;
+							alert( a ); // 5			
+						</code></pre>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h4>Initialization order</h4>
+						<ol>
+							<li>The first phase is initialization, preparation for launch.</li>
+							<li>In the second phase - actually, implementation.</li>
+						</ol>
+					</section>
+					<section>
+						<p>In JavaScript, there is no difference between a declaration outside the block:</p>
+						<pre><code data-trim contenteditable>
+							var i;
+							{
+							  i = 5;
+							}								
+						</code></pre>
+						<p>... And inside it:</p>
+						<pre><code data-trim contenteditable>
+							i = 5;
+							{
+							  var i;
+							}							
+						</code></pre>
+					</section>	
+					<section>
+						<p>There is also no difference between a declaration in a loop and outside it:</p>
+						<pre><code data-trim contenteditable>
+							for (var i = 0; i <5; i ++) {};
+							
+							var i;
+							for (i = 0; i <5; i ++) {}	
+						</code></pre>
+						<p>It doesn't matter where and how many times the variable is declared.</p>
+						<pre><code data-trim contenteditable>
+							var i = 10;
+							for (var i = 0; i <20; i ++) {
+							  ...
+							}
+							var i = 5;		
+						</code></pre>
+					</section>
+				</section>
+				<section>
+					<h4>Total</h4>
+					<ul>
+						<li>Functions declared as Function Declaration are completely created and ready to use.</li>
+						<li>Variables declared, but equal to undefined. Assignments will be executed later when execution reaches them.</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Closures, internal functions</h3>
+					<p>Lexical environment</p>
+					<p>Access to external variables</p>
+					<p>Always current value</p>
+				</section>
+				<section>
+					<h4>Lexical environment</h4>
+					<pre><code data-trim contenteditable>
+						function sayHi (name) {
+						//LexicalEnvironment = {name:'Vasya',phrase: undefined}
+							var phrase = "Hello," + name;
+							alert (phrase);
+						 }
+						sayHi ('Vasya');						  
+					</code></pre>
+					<p>The function is executed.</p>
+					<pre><code data-trim contenteditable>
+						function sayHi (name) {
+						//LexicalEnvironment = {name:'Vasya',phrase: undefined}
+							var phrase = "Hello," + name;
+						//LexicalEnvironment = {name:'Vasya',phrase: undefined}	
+							alert (phrase);
+						 }
+						sayHi ('Vasya');						  
+					</code></pre>
+				</section>
+				<section>
+					<section>					
+						<h4>Access to external variables</h4>
+						<pre><code data-trim contenteditable>
+							var userName = "Vasya";
+							function sayHi () {
+								alert (userName); // "Vasya"
+							}
+						</code></pre>						
+						
+						<p>sayHi. [[Scope]] = window</p>
+					</section>
+					<section>
+						<ul>
+							<li>Each function upon creation receives a [[Scope]]
+								reference to an object with variables in the context of which it was created.</li>
+							<li>When the function starts, a new object is created with LexicalEnvironment variables. 
+								It receives a reference to an external variable object from [[Scope]].</li>
+							<li>When searching for variables, it is carried out first in the current variable
+								object, and then on this link.</li>
+						</ul>
+					</section>
+				</section>
+				<section>
+					<h4>Always current value</h4>
+					<p>The value of a variable from the outer region is always current. It may not be what
+						it was at the time the function was created.</p>
+				</section>					
+				</section>
+				<section>
+					<h4>Total: closure</h4>
+					<p> “Understand closures” in JavaScript means to understand the following things:</p>
+					<ul class='small-ul'>
+						<li>All variables and parameters of functions are properties of the variable object
+							LexicalEnvironment. Each function launch creates a new such object. At the top level,
+							it is the “global object”, in the browser - the window.</li>
+						<li>When created, the function gets the [[Scope]] system property, which refers to the 
+							LexicalEnvironment in which it was created.</li>
+						<li>When calling a function, wherever it is passed in the code, it will look for variables
+							first in itself and then in external LexicalEnvironment from the place of its “birth”.</li>
+					</ul>
+				</section>
+				<section>
+					<section>				
+						<h4>Block Scope</h4>
+						<p>Variable let and const</p>
+						<p>The scope of the let and const variables is the {...} block.</p>
+					</section>
+					<section>
+						<p>For example, a variable var:</p>
+						<pre><code data-trim contenteditable>
+							var apples = 5;
+							if (true) {
+							  	var apples = 10
+							 	 alert (apples); // 10 (inside the block)
+							 }
+							alert (apples); // 10 (the same outside the block)	
+						</code></pre>
+						<p>The same with let will work differently:</p>
+						<pre><code data-trim contenteditable>
+							let apples = 5;
+							if (true) {
+							  	let apples = 10
+							 	alert (apples); // 10 (inside the block)
+							 }
+							alert (apples);
+							 // 5 (the value has not changed outside the block)		
+						</code></pre>
+					</section>
+					<section>
+						<p>the let and const variables is always visible in the block where it is declared.</p>
+						<pre><code data-trim contenteditable>
+							if (true) {
+								let apples = 10;
+								alert (apples); // 10 (inside the block)
+							 }
+							alert (apples); // mistake!
+						</code></pre>
+					</section>
+				</section>	
+				<section>
+					<p>It's all</p>
+					<p>Thank for your attention</p>
+				</section>	
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
